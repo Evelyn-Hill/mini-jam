@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SRC 
 	src/main.cpp
 	src/Global.cpp
-    src/rhythm.cpp
+    src/Rhythm.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

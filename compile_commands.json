@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/plum/Dev/cpp/mini-jam/build",
+  "command": "/usr/bin/c++ -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP -I/home/plum/Dev/cpp/mini-jam/vendor/raygui/src -I/home/plum/Dev/cpp/mini-jam/vendor/raylib/src  -o CMakeFiles/mini-jam.dir/src/main.cpp.o -c /home/plum/Dev/cpp/mini-jam/src/main.cpp",
+  "file": "/home/plum/Dev/cpp/mini-jam/src/main.cpp",
+  "output": "CMakeFiles/mini-jam.dir/src/main.cpp.o"
+}
+]

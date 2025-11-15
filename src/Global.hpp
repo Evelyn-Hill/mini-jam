@@ -1,10 +1,11 @@
-#include "Assert.hpp"
+#pragma once
+#include "Entity.hpp"
 #include "Level.hpp"
 #include "Log.hpp"
-#include "Types.hpp"
+#include <vector>
 
 struct Global {
-  const char *name = "Hi";
+  std::vector<Entity *> entities;
   Music music;
   float tempo;
   Level level;

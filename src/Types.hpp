@@ -19,36 +19,3 @@ typedef Vector3 vec3;
 typedef Vector4 vev4;
 
 typedef Matrix mat4;
-
-
-// == STRUCTS ==
-
-struct WindowData {
-	WindowData(i32 width, i32 height, const char* title, i32 targetFps = 60) {
-		this->width = width;
-		this->height = height;
-		this->title = title;
-		this->targetFPS = targetFps;
-	}
-
-	i32 targetFPS;
-	i32 width;
-	i32 height;
-	const char* title;
-};
-
-struct RenderData {
-	RenderData() {
-		windowData = nullptr;
-	}
-
-	WindowData* windowData;
-};
-
-// == RENDER STRUCTS ==
-
-struct Square {
-	vec2 pos;
-	vec2 size;
-	Color color;
-};

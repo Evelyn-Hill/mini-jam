@@ -1,4 +1,5 @@
 #include "TextureAtlas.hpp"
+#include <string>
 #include <unordered_map>
 #include "Assert.hpp"
 #include "raylib.h"
@@ -23,5 +24,3 @@ void TextureAtlas::TALoadTexture(std::string name) {
 	ASSERT(IsTextureValid(tex), "Could not load texture: " + concat);
 	map->emplace(std::make_pair(name, LoadTexture(concat.c_str())));
 }
-
-

@@ -1,10 +1,7 @@
 #pragma once
 #include "Types.hpp"
-#include <chrono>
 #include <raymath.h>
-#include <unordered_map>
 #include "Global.hpp"
-#include "TextureAtlas.hpp"
 #include "raylib.h"
 
 struct Entity;
@@ -27,6 +24,8 @@ bool skip[POINT_LEN] = {
 	false, false, false, true, false, false, false
 };
 
+
+
 vec2 points[POINT_LEN] {
 	{ -300, 280 },
 	{200, 280},
@@ -36,6 +35,12 @@ vec2 points[POINT_LEN] {
 	{700, 520},
 	{1150, 710},
 };
+
+vec2 bezierControlPoint = { 1000, 200 };
+int bezierPoint = 5;
+int bezierDuration = 1;
+
+
 
 struct Entity {
 	vec2 position;
@@ -53,6 +58,9 @@ struct Entity {
 	bool visible = true;
 	bool dead = false;
 	Texture2D texture;
+	float rotSpeed;
+	int drawLayer = 0;
+
 	
 
 	void Lerp(float delta) {
@@ -78,7 +86,6 @@ struct Entity {
 			animationTimer = 0;
 			waitTimer = 0;
 			lastVisited++;
-			l->Info(lastVisited);
 			return;
 		}
 
@@ -100,18 +107,21 @@ struct Entity {
 			}
 
 			animationTimer += delta;
-			float alpha = Clamp(animationTimer / animationDuration, 0, 1);
-			position = Vector2Lerp(startingPosition, destination, alpha);
+			if (lastVisited != bezierPoint) {
+				float alpha = Clamp(animationTimer / animationDuration, 0, 1);
+				position = Vector2Lerp(startingPosition, destination, alpha);
+			} else {
+				float alpha = Clamp(animationTimer / bezierDuration, 0, 1);
+				position = GetSplinePointBezierQuad(startingPosition, bezierControlPoint, destination, alpha);
+			}
 		} else {
 			animationState = AnimationState::PAUSED;
 			animationTimer = 0;
 			startingPosition = destination;
 			lastVisited++;
-			l->Info(lastVisited);
 		}
 	}
 };
-
 
 Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState defaultAnimState) {	
 	Entity* e = new Entity {
@@ -132,7 +142,7 @@ Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState default
 	return e;
 }
 
-Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Texture2D tex) {
+Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Texture2D tex, float rotSpeed = 0, int drawLayer = 0) {
 	Entity* e = new Entity {
 		pos,
 		{0, 0},
@@ -147,11 +157,17 @@ Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Tex
 
 	e->texture = tex;
 	e->size = vec2(tex.width, tex.height);
+	e->rotSpeed = rotSpeed;
+	e->drawLayer = drawLayer;
 
 	g->entities.push_back(e);
 	e->index = g->entities.size() - 1;
 	return e;
 }
+
+Entity* GetRotatingBackgroundEntity(vec2 pos, Render r, float rotSpeed, Texture2D tex) {
+
+};
 
 void DeleteEntity(Entity* e) {
 	for (int i = 0; i < g->entities.size(); i++) {

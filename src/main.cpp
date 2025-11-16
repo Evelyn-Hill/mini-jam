@@ -18,6 +18,8 @@ void DrawTex(Entity *e);
 void FlushEntities();
 void DrawRotTex(vec2 pos, Texture2D tex, float time, float rotSpeed);
 void CountQuarters();
+void MimicPattern(Pattern* p);
+void ListenPattern(Pattern* p);
 
 static TextureAtlas ta;
 
@@ -73,6 +75,7 @@ int main() {
   ta.TALoadTexture("cog3");
   ta.TALoadTexture("fan1");
   ta.TALoadTexture("fan2");
+  ta.TALoadTexture("wireSheet");
 
   GetSpriteEntity({70, 250}, DrawTex, AnimationState::DONE,
                   ta.GetTexture("cog1"), -3, 1);
@@ -100,16 +103,23 @@ void Update(float deltaTime) {
 
   if (g->spawnedThisBeat == false) {
     if (g->currentQuarter == 1) {
-      GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
+      Entity* e = GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
                       ta.GetTexture("bomb1"));
+
+      e->mimic = MimicPattern;
+      e->listen = ListenPattern;
       g->spawnedThisBeat = true;
+
       return;
     }
 
     if ((g->currentQuarter - 1) % 16 == 0) {
 
-      GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
+      Entity* e = GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
                       ta.GetTexture("bomb1"));
+      e->mimic = MimicPattern;
+      e->listen = ListenPattern;
+
       g->spawnedThisBeat = true;
       return;
     }
@@ -206,7 +216,15 @@ void Draw() {
     }
   }
 
+  DrawTextureRec(ta.GetTexture("wireSheet"), Rectangle {
+    0, 0,
+    (float)ta.GetTexture("wireSheet").width / 8, (float)ta.GetTexture("wireSheet").height
+
+  }, {200, 100}, WHITE);
+
   EndDrawing();
+
+
 }
 
 void FlushEntities() {
@@ -236,6 +254,35 @@ void DrawTex(Entity *e) {
 
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
 }
+
+
+void DrawBomb(Entity *e) {
+  Rectangle sr = {0, 0, (float)e->texture.width, (float)e->texture.height};
+
+  Rectangle dr = {e->position.x, e->position.y, (float)e->texture.width,
+                  (float)e->texture.height};
+
+  vec2 origin = {(float)e->texture.width / 2, (float)e->texture.height / 2};
+
+  DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
+  
+  Texture2D wireSheet = ta.GetTexture("wireSheet");
+  int count = 0;
+  for (Beat b : e->pattern->rhythm) {
+      DrawTextureRec(
+      wireSheet,
+      Rectangle {
+        0, 0,
+        (float)wireSheet.width / 8, (float)wireSheet.height
+      },
+      { e->position.x + (20 * count), e->position.y + (20 * count) },
+      WHITE
+    );
+
+    count++;
+  }
+}
+
 
 void CountQuarters() {
   g->currentQuarter = getBeat(g->music, QUARTER, g->tempo).beatNumber;
@@ -284,3 +331,11 @@ void AllocatePatterns() {
       Beat(),
   });
 }
+
+void MimicPattern(Pattern* p) {
+  l->Info("Mimic");
+};
+
+void ListenPattern(Pattern* p){
+  l->Info("Pattern");
+};

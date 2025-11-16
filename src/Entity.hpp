@@ -12,17 +12,22 @@ enum AnimationState : u8 {
 	PAUSED,
 	PLAYING,
 };
+enum EntityType : u8 {
+	BOMB,
+	OTHER,
+};
 
 typedef void (*Render)(Entity* e);
 
 const int POINT_LEN = 7;
 
-float waitMultipliers[POINT_LEN] = {
-	1, 1, 2, 0, 0, 2, 0
+struct PointPair {
+	int a;
+	int b;
 };
 
-bool skip[POINT_LEN] = {
-	false, false, false, true, false, false, false
+float waitMultipliers[POINT_LEN] = {
+	0, 2, 4, 0, 2, 4, 0
 };
 
 vec2 points[POINT_LEN] {
@@ -33,6 +38,10 @@ vec2 points[POINT_LEN] {
 	{-300, 520},
 	{700, 520},
 	{1150, 710},
+};
+
+bool skip[POINT_LEN] = {
+	false, false, false, true, false, false, false
 };
 
 vec2 bezierControlPoint = { 1000, 200 };
@@ -58,12 +67,26 @@ struct Entity {
 	float rotSpeed;
 	int drawLayer = 0;
 	int waitMultipler = 0;
-
 	
+	int lastEighth = 0;
+	int currentEighth = 0;
+
+	int lastQuarter = 0;
+	int currentQuarter = 0;
+	
+	int lastHalf = 0;
+	int currentHalf = 0;
+
+	int lastWhole = 0;
+	int currentWhole = 0;	
+
+	int pickupIntervalBeats = 1;
+	int pickupCount = 0;
 
 	void Lerp(float delta) {
 		// Replace this 1 with the eventual beat time.
-		waitTime = 1 * waitMultipliers[lastVisited];
+		waitTime = animationDuration * waitMultipliers[lastVisited];
+		destination = points[lastVisited + 1];
 
 		if (animationState == AnimationState::DONE) {
 			return;
@@ -71,15 +94,12 @@ struct Entity {
 
 		if (lastVisited == POINT_LEN - 1) {
 			animationState = AnimationState::DONE;
-			l->Info("Final Point");
 			visible = false;
 			dead = true;
 			return;
 		}
 
-
 		if (skip[lastVisited] == true) {
-			l->Info("skip");
 			startingPosition = points[lastVisited + 1];
 			animationTimer = 0;
 			waitTimer = 0;
@@ -89,7 +109,7 @@ struct Entity {
 
 		if (animationState == AnimationState::PAUSED) {
 			waitTimer += delta;
-			if (waitTimer >= waitTime * waitMultipliers[lastVisited]) {
+			if (waitTimer >= waitTime) {
 				animationState = AnimationState::PLAYING;
 				waitTimer = 0;
 			}
@@ -97,13 +117,6 @@ struct Entity {
 		}
 
 		if (animationTimer < animationDuration) {
-			l->Info(animationTimer, " : ", animationDuration);
-			if (skip[lastVisited] == true) {
-				destination = points[lastVisited];
-			} else {
-				destination = points[lastVisited + 1];
-			}
-
 			animationTimer += delta;
 			if (lastVisited != bezierPoint) {
 				float alpha = Clamp(animationTimer / animationDuration, 0, 1);
@@ -119,6 +132,52 @@ struct Entity {
 			lastVisited++;
 		}
 	}
+
+	void PollBeats() {
+		if (animationState == AnimationState::DONE) {return;}
+
+		currentEighth = getBeat(g->music, EIGHTH, g->tempo).beatNumber;
+		currentQuarter = getBeat(g->music, QUARTER, g->tempo).beatNumber;
+		currentHalf = getBeat(g->music, HALF, g->tempo).beatNumber;
+		currentWhole = getBeat(g->music, WHOLE, g->tempo).beatNumber;
+
+		if (lastEighth < currentEighth) {
+			OnEighth();
+			lastEighth = currentEighth;
+		}
+
+		if (lastQuarter < currentQuarter) {
+			OnQuarter();
+			lastQuarter = currentQuarter;
+		}
+
+		if (lastHalf < currentHalf) {
+			OnHalf();
+			lastHalf = currentHalf;
+		}
+
+		if (lastWhole < currentWhole) {
+			OnWhole();
+			lastWhole = currentWhole;
+		}
+	}
+	
+	void OnEighth() {
+	}
+
+
+	void OnQuarter() {
+		pickupCount++;
+	}
+
+
+	void OnHalf() {
+	}
+
+
+	void OnWhole() {
+	}
+
 };
 
 Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState defaultAnimState) {	
@@ -141,31 +200,20 @@ Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState default
 }
 
 Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Texture2D tex, float rotSpeed = 0, int drawLayer = 0) {
-	Entity* e = new Entity {
-		pos,
-		{0, 0},
-		pos,
-		{0, 0},
-		secondsPerBeat(g->tempo),
-		0.0,
-		0,
-		defaultAnimState,
-		r
-	};
-
-	e->texture = tex;
+	Entity* e = new Entity;
+	e->position = pos;
 	e->size = vec2(tex.width, tex.height);
+	e->startingPosition = pos;	
+	e->animationDuration = secondsPerBeat(g->tempo);
+	e->animationState = defaultAnimState;
+	e->renderMethod = r;
+	e->texture = tex;
 	e->rotSpeed = rotSpeed;
 	e->drawLayer = drawLayer;
-
 	g->entities.push_back(e);
 	e->index = g->entities.size() - 1;
 	return e;
 }
-
-Entity* GetRotatingBackgroundEntity(vec2 pos, Render r, float rotSpeed, Texture2D tex) {
-
-};
 
 void DeleteEntity(Entity* e) {
 	for (int i = 0; i < g->entities.size(); i++) {
@@ -174,4 +222,3 @@ void DeleteEntity(Entity* e) {
 		}
 	}
 }
-

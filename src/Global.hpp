@@ -14,6 +14,9 @@ struct Global {
   Level *level;
   LevelSegment levelSegment;
   std::vector<Accuracy> clicks;
+  int currentQuarter;
+  int lastQuarter;
+  bool spawnedThisBeat;
 };
 
 extern Global *g;

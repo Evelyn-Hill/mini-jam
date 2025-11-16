@@ -3,6 +3,7 @@
 #include "Level.hpp"
 #include "TextureAtlas.hpp"
 #include "Scoring.hpp"
+#include "Rhythm.hpp"
 #include <iostream>
 #include <raygui.h>
 #include <raylib.h>
@@ -10,14 +11,19 @@
 #include <unordered_map>
 #include <utility>
 
-void Update();
+void Update(float deltaTime);
 void Draw();
 void DrawRect(Entity *e);
 void DrawTex(Entity *e);
 void FlushEntities();
 void DrawRotTex(vec2 pos, Texture2D tex, float time, float rotSpeed);
+void CountQuarters();
 
 static TextureAtlas ta;
+
+float pickupTime;
+float pickupTimer = 0;
+
 
 int main() {
   SetTraceLogLevel(LOG_WARNING);
@@ -25,7 +31,11 @@ int main() {
   InitAudioDevice();
 
   l->Info("Hello, Minijam!");
+<<<<<<< HEAD
   g->tempo = 180;
+  g->lastQuarter = 0;
+  g->currentQuarter = 0;
+  g->spawnedThisBeat = false;
 
   g->music = LoadMusicStream("assets/save_it_redd.mp3");
 
@@ -60,6 +70,8 @@ int main() {
   g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
   l->Info("got current level segment, level loading complete");
 
+  pickupTime = secondsPerBeat(g->tempo);
+
   PlayMusicStream(g->music);
 
   ta.TALoadTexture("bomb1");
@@ -77,9 +89,6 @@ int main() {
   ta.TALoadTexture("fan1");
   ta.TALoadTexture("fan2");
 
-  GetSpriteEntity(points[0], DrawTex, AnimationState::PLAYING,
-                  ta.GetTexture("bomb1"));
-
   GetSpriteEntity({70, 250}, DrawTex, AnimationState::DONE,
                   ta.GetTexture("cog1"), -3, 1);
   GetSpriteEntity({306, 30}, DrawTex, AnimationState::DONE,
@@ -93,7 +102,7 @@ int main() {
                   ta.GetTexture("fan2"), 750, 2);
 
   while (!WindowShouldClose()) {
-    Update();
+    Update(GetFrameTime());
     Draw();
     FlushEntities();
   }
@@ -101,21 +110,41 @@ int main() {
   CloseWindow();
 }
 
-void Update() {
+void Update(float deltaTime) {
+  CountQuarters();
+  
+  if (g->spawnedThisBeat == false) {
+    if (g->currentQuarter == 1) {
+      GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
+                      ta.GetTexture("bomb1"));
+      g->spawnedThisBeat = true;
+      return;
+    }
+
+    if ((g->currentQuarter - 1) % 16 == 0) {
+
+      GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
+                      ta.GetTexture("bomb1"));
+      g->spawnedThisBeat = true;
+      return;
+    }
+  }
+
   for (Entity *e : g->entities) {
-    e->Lerp(GetFrameTime());
+    e->Lerp(deltaTime);
+    e->PollBeats();
   }
 
   UpdateMusicStream(g->music);
 
-  g->level->time += GetFrameTime();
+  g->level->time += deltaTime;
 
   // first switch statement determines whether or not the current segment is
   // still current
   switch (g->levelSegment.tag) {
   case LevelSegmentTag::PATTERN: {
     Pattern &p = g->levelSegment.pattern;
-    p.time += GetFrameTime();
+    p.time += deltaTime;
     float patternDuration = duration(p, g->tempo);
     if (p.time > patternDuration) {
       g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
@@ -124,7 +153,7 @@ void Update() {
   }
   case LevelSegmentTag::REST: {
     RestSegment &r = g->levelSegment.rest;
-    r.time += GetFrameTime();
+    r.time += deltaTime;
     float restDuration = segmentGetDuration(g->levelSegment, g->tempo);
     if (r.time > restDuration) {
       g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
@@ -221,4 +250,16 @@ void DrawTex(Entity *e) {
   vec2 origin = {(float)e->texture.width / 2, (float)e->texture.height / 2};
 
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
+<<<<<<< HEAD
+=======
+}
+
+
+void CountQuarters() {
+  g->currentQuarter = getBeat(g->music, QUARTER, g->tempo).beatNumber;
+  if (g->lastQuarter < g->currentQuarter) {
+    g->spawnedThisBeat = false;
+    g->lastQuarter = g->currentQuarter;
+  }
+>>>>>>> c935eb894c1fc8f8b74cc30284ade32728375ddf
 }

@@ -3,6 +3,11 @@
 #include "Level.hpp"
 #include "Log.hpp"
 #include <vector>
+<<<<<<< HEAD
+=======
+
+struct Entity;
+>>>>>>> 2c582bb (Added texutre atlas)
 
 struct Global {
   std::vector<Entity *> entities;

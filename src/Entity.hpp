@@ -1,6 +1,7 @@
 #pragma once
 #include "Types.hpp"
 #include <raymath.h>
+#include "Global.hpp"
 
 struct Entity;
 
@@ -21,6 +22,7 @@ struct Entity {
 	float animationTimer;
 	AnimationState animationState;
 	Render renderMethod;
+	int index;
 
 	void Lerp(float delta) {
 		if (animationState == AnimationState::DONE) {
@@ -38,4 +40,23 @@ struct Entity {
 		}
 	}
 };
+
+
+Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r) {
+	
+	Entity* e = new Entity {
+		pos,
+		size,
+		pos,
+		{0, 0},
+		0.0,
+		0.0,
+		AnimationState::PAUSED,
+		r
+	};
+	
+	e->index = g->entities.size() - 1;
+	g->entities.push_back(e);
+	return e;
+}
 

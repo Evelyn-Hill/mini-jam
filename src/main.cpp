@@ -1,7 +1,9 @@
 #include "Entity.hpp"
 #include "Global.hpp"
-#include "Rhythm.hpp"
+#include "Level.hpp"
 #include "TextureAtlas.hpp"
+#include "Scoring.hpp"
+#include "Rhythm.hpp"
 #include <iostream>
 #include <raygui.h>
 #include <raylib.h>
@@ -29,14 +31,47 @@ int main() {
   InitAudioDevice();
 
   l->Info("Hello, Minijam!");
-  g->tempo = 108;
+<<<<<<< HEAD
+  g->tempo = 180;
   g->lastQuarter = 0;
   g->currentQuarter = 0;
   g->spawnedThisBeat = false;
 
+  g->music = LoadMusicStream("assets/save_it_redd.mp3");
+
+  g->level = new Level();
+  levelAppend(g->level, 1);
+  l->Info("created level");
+
+  int totalSongBeats =
+      round(GetMusicTimeLength(g->music) / secondsPerBeat(g->tempo));
+  l->Info("song has ", totalSongBeats, " beats");
+  int measures = (totalSongBeats - 1) / 4;
+  l->Info("song has ", measures, " measures");
+
+  Pattern fourQuarterNotes = {
+      (Beat){.count = 1, .subdivision = QUARTER},
+      (Beat){.count = 1, .subdivision = QUARTER},
+      (Beat){.count = 1, .subdivision = QUARTER},
+      (Beat){.count = 1, .subdivision = QUARTER},
+  };
+  l->Info("created pattern with 4 quarter notes");
+
+  for (int i = 0; i < measures; i += 1) {
+    l->Info("inserting segment for measure ", i);
+    if (i % 2 == 0) {
+      levelAppend(g->level, fourQuarterNotes);
+    } else {
+      levelAppend(g->level, 4);
+    }
+  }
+  l->Info("added beat patterns to level");
+
+  g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
+  l->Info("got current level segment, level loading complete");
+
   pickupTime = secondsPerBeat(g->tempo);
 
-  g->music = LoadMusicStream("assets/save_it_redd.mp3");
   PlayMusicStream(g->music);
 
   ta.TALoadTexture("bomb1");
@@ -75,7 +110,7 @@ int main() {
   CloseWindow();
 }
 
-void Update(float deltaTime) {  
+void Update(float deltaTime) {
   CountQuarters();
   
   if (g->spawnedThisBeat == false) {
@@ -101,6 +136,44 @@ void Update(float deltaTime) {
   }
 
   UpdateMusicStream(g->music);
+
+  g->level->time += deltaTime;
+
+  // first switch statement determines whether or not the current segment is
+  // still current
+  switch (g->levelSegment.tag) {
+  case LevelSegmentTag::PATTERN: {
+    Pattern &p = g->levelSegment.pattern;
+    p.time += deltaTime;
+    float patternDuration = duration(p, g->tempo);
+    if (p.time > patternDuration) {
+      g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
+    }
+    break;
+  }
+  case LevelSegmentTag::REST: {
+    RestSegment &r = g->levelSegment.rest;
+    r.time += deltaTime;
+    float restDuration = segmentGetDuration(g->levelSegment, g->tempo);
+    if (r.time > restDuration) {
+      g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
+    }
+    break;
+  }
+  }
+
+  if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+    g->clicks.push_back(getBeatAccuracy());
+  }
+
+  // PERF: potentially expensive to count all the beats that have passed in the
+  // song and also loop through every time the player has clicked every frame
+  int passedBeats = levelGetPassedBeats(*g->level, g->tempo, GOOD_THRESHOLD);
+  int goodClicks = countGoodClicks();
+  if (passedBeats > goodClicks) {
+    // enter fail state
+    l->Error("missed a spot!");
+  }
 }
 
 void Draw() {
@@ -177,6 +250,8 @@ void DrawTex(Entity *e) {
   vec2 origin = {(float)e->texture.width / 2, (float)e->texture.height / 2};
 
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
+<<<<<<< HEAD
+=======
 }
 
 
@@ -186,4 +261,5 @@ void CountQuarters() {
     g->spawnedThisBeat = false;
     g->lastQuarter = g->currentQuarter;
   }
+>>>>>>> c935eb894c1fc8f8b74cc30284ade32728375ddf
 }

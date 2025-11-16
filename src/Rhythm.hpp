@@ -20,9 +20,26 @@ struct Pattern {
   std::vector<Beat> rhythm;
   float time;
 
+  Pattern(std::initializer_list<Beat> beats) {
+    rhythm = {beats};
+    time = 0;
+  }
+
   Pattern(const Pattern &other) {
-    rhythm = std::move(other.rhythm);
+    rhythm = {};
+    for (auto b : other.rhythm) {
+      rhythm.push_back(b);
+    }
     time = other.time;
+  };
+
+  Pattern &operator=(const Pattern &other) {
+    rhythm = {};
+    for (auto b : other.rhythm) {
+      rhythm.push_back(b);
+    }
+    time = other.time;
+    return *this;
   };
 };
 

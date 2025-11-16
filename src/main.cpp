@@ -53,6 +53,7 @@ int main() {
   ta.TALoadTexture("cog3");
   ta.TALoadTexture("fan1");
   ta.TALoadTexture("fan2");
+  ta.TALoadTexture("wireSheet");
 
   GetSpriteEntity({70, 250}, DrawTex, AnimationState::DONE,
                   ta.GetTexture("cog1"), -3, 1);
@@ -149,6 +150,12 @@ void Draw() {
   }
 
   EndDrawing();
+
+  DrawTextureRec(ta.GetTexture("wireSheet"), Rectangle {
+    0, 0,
+    (float)ta.GetTexture("wireSheet").width / 8, (float)ta.GetTexture("wireSheet").height
+
+  }, {200, 100}, WHITE);
 }
 
 void FlushEntities() {

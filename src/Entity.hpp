@@ -15,6 +15,7 @@ enum AnimationState : u8 {
 enum EntityType : u8 {
 	BOMB,
 	OTHER,
+	SUPERVISOR,
 };
 
 typedef void (*Render)(Entity* e);

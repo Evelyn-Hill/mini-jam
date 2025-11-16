@@ -9,7 +9,18 @@ void Update();
 void Draw();
 void DrawRect(Entity* e);
 
+const int POINT_LEN = 7;
+
 static TextureAtlas ta;
+static vec2 points[POINT_LEN] {
+	{ -50, 350 },
+	{200, 350},
+	{900, 350},
+	{1500, 350},
+	{-50, 600},
+	{700, 600},
+	{1150, 710},
+};
 
 int main() {
 	SetTraceLogLevel(LOG_WARNING);
@@ -19,7 +30,7 @@ int main() {
 
 	ta.TALoadTexture("conveyorbelt");
 
-	GetRectangleEntity({20, 20}, {20, 20}, DrawRect);
+	GetRectangleEntity(points[0], {20, 20}, DrawRect, AnimationState::PLAYING);
 
 	while (!WindowShouldClose()) {
 		Update();
@@ -30,11 +41,9 @@ int main() {
 }
 
 
-
 void Update() {
-
 	for (Entity* e : g->entities) {
-		e->Lerp(GetFrameTime());
+		e->Lerp(GetFrameTime(), points, POINT_LEN);
 	}
 
 }
@@ -47,6 +56,15 @@ void Draw() {
 	
 	DrawTexture(ta.GetTexture("conveyorbelt"), 0, 0, WHITE);
 	for (Entity* e : g->entities) {
+		if (e->dead) {
+			delete g->entities[e->index];
+			continue;
+		}
+
+		if (!e->visible) {
+			continue;
+		}
+
 		e->renderMethod(e);
 	}
 
@@ -54,7 +72,8 @@ void Draw() {
 }
 
 
-void DrawRect(Entity* e) { 	
+void DrawRect(Entity* e) { 		
+
 	DrawRectangleRec(
 		Rectangle {
 			e->position.x - e->size.x / 2,

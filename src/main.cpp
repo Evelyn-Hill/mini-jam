@@ -49,7 +49,8 @@ int main() {
 
   g->level = new Level();
   levelInit(g->level);
-
+  
+  g->state = PlaybackState::NONE;
   int totalSongBeats =
       round(GetMusicTimeLength(g->music) / secondsPerBeat(g->tempo));
   int measures = (totalSongBeats - 1) / 4;
@@ -138,6 +139,32 @@ void Update(float deltaTime) {
     g->currentPattern->time += deltaTime;
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
       g->clicks.push_back(getBeatAccuracy());
+    }
+  }
+  
+  if (g->currentPattern != NULL) {
+    if (g->state == PlaybackState::MIMIC) {
+      auto patternDuration = duration(*g->currentPattern, g->tempo);
+      g->currentPattern->time += deltaTime; 
+      if (g->currentPattern->time >= patternDuration) {
+        g->state = PlaybackState::NONE;
+        g->currentPattern = NULL;
+        return;
+      }
+
+      l->Info("Mimic"); 
+    }
+
+    if (g->state == PlaybackState::LISTEN) {
+      auto patternDuration = duration(*g->currentPattern, g->tempo);
+      g->currentPattern->time += deltaTime; 
+      if (g->currentPattern->time >= patternDuration) {
+        g->state = PlaybackState::NONE;
+        g->currentPattern = NULL;
+        return;
+      }
+
+      l->Info("Listen"); 
     }
   }
 
@@ -309,7 +336,10 @@ void AllocatePatterns() {
   });
 }
 
-void MimicPattern(Pattern *p) { l->Info("Mimic"); };
+void MimicPattern(Pattern *p) { 
+  l->Info("Mimic"); 
+  g->state = PlaybackState::MIMIC;
+};
 
 void ListenPattern(Pattern* p) { 
   l->Info("Pattern");

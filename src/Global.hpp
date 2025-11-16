@@ -1,9 +1,11 @@
+#pragma once
 #include "Log.hpp"
-#include "Types.hpp"
-#include "Assert.hpp"
+#include <vector>
+
+struct Entity;
 
 struct Global {
-	const char* name = "Hi";
+	std::vector<Entity*> entities;
 };
 
 extern Global* g;

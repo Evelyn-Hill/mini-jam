@@ -72,4 +72,4 @@ float quarters(Subdivision s) {
   return result;
 }
 
-float secondsPerBeat(float tempo) { return 60 / tempo; }
+float secondsPerBeat(float tempo) { return 60.0 / tempo; }

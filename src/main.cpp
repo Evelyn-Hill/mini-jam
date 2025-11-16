@@ -21,8 +21,13 @@ static TextureAtlas ta;
 int main() {
 	SetTraceLogLevel(LOG_WARNING);
 	InitWindow(1280, 720, "Hello, World!");
+	InitAudioDevice();
 	
 	l->Info("Hello, Minijam!");
+	g->tempo = 180;
+
+	g->music = LoadMusicStream("assets/save_it_redd.mp3");
+	PlayMusicStream(g->music);
 
 	ta.TALoadTexture("bomb1");
 	ta.TALoadTexture("conveyorbelt");
@@ -41,11 +46,14 @@ int main() {
 
 
 	GetSpriteEntity(points[0], DrawTex, AnimationState::PLAYING, ta.GetTexture("bomb1"));
+
 	GetSpriteEntity({70, 250}, DrawTex, AnimationState::DONE, ta.GetTexture("cog1"), -3, 1);
 	GetSpriteEntity({306, 30}, DrawTex, AnimationState::DONE, ta.GetTexture("cog2"), 12, 1);
 	GetSpriteEntity({645, 55}, DrawTex, AnimationState::DONE, ta.GetTexture("cog3"), -5, 1);
+
 	GetSpriteEntity({85, -5}, DrawTex, AnimationState::DONE, ta.GetTexture("fan1"), -500, 2);
 	GetSpriteEntity({1030, 50}, DrawTex, AnimationState::DONE, ta.GetTexture("fan2"), 750, 2);
+
 
 	while (!WindowShouldClose()) {
 		Update();
@@ -61,6 +69,8 @@ void Update() {
 	for (Entity* e : g->entities) {
 		e->Lerp(GetFrameTime());
 	}
+
+	UpdateMusicStream(g->music);
 }
 
 

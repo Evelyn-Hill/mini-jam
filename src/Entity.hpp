@@ -3,6 +3,7 @@
 #include <raymath.h>
 #include "Global.hpp"
 #include "raylib.h"
+#include "Rhythm.hpp"
 
 struct Entity;
 
@@ -17,14 +18,12 @@ typedef void (*Render)(Entity* e);
 const int POINT_LEN = 7;
 
 float waitMultipliers[POINT_LEN] = {
-	0, 1, 2, 0.1, 0.1, 2, 0.1
+	1, 1, 2, 0, 0, 2, 0
 };
 
 bool skip[POINT_LEN] = {
 	false, false, false, true, false, false, false
 };
-
-
 
 vec2 points[POINT_LEN] {
 	{ -300, 280 },
@@ -40,16 +39,14 @@ vec2 bezierControlPoint = { 1000, 200 };
 int bezierPoint = 5;
 int bezierDuration = 1;
 
-
-
 struct Entity {
 	vec2 position;
 	vec2 size;
 	vec2 startingPosition;
 	vec2 destination;
-	float animationDuration = 1.0;
+	float animationDuration = secondsPerBeat(g->tempo);
 	float animationTimer = 0;
-	int waitTime = 0; 
+	float waitTime = 0; 
 	AnimationState animationState;
 	Render renderMethod;
 	int index;
@@ -60,6 +57,7 @@ struct Entity {
 	Texture2D texture;
 	float rotSpeed;
 	int drawLayer = 0;
+	int waitMultipler = 0;
 
 	
 
@@ -89,10 +87,9 @@ struct Entity {
 			return;
 		}
 
-
 		if (animationState == AnimationState::PAUSED) {
 			waitTimer += delta;
-			if (waitTimer >= waitTime) {
+			if (waitTimer >= waitTime * waitMultipliers[lastVisited]) {
 				animationState = AnimationState::PLAYING;
 				waitTimer = 0;
 			}
@@ -100,6 +97,7 @@ struct Entity {
 		}
 
 		if (animationTimer < animationDuration) {
+			l->Info(animationTimer, " : ", animationDuration);
 			if (skip[lastVisited] == true) {
 				destination = points[lastVisited];
 			} else {
@@ -129,9 +127,9 @@ Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState default
 		size,
 		pos,
 		{0, 0},
-		3.0,
+		secondsPerBeat(g->tempo),
 		0.0,
-		0,
+		secondsPerBeat(g->tempo),
 		defaultAnimState,
 		r
 	};
@@ -148,7 +146,7 @@ Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Tex
 		{0, 0},
 		pos,
 		{0, 0},
-		3.0,
+		secondsPerBeat(g->tempo),
 		0.0,
 		0,
 		defaultAnimState,

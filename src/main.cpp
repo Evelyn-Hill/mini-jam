@@ -20,11 +20,21 @@ void DrawRotTex(vec2 pos, Texture2D tex, float time, float rotSpeed);
 void CountQuarters();
 void MimicPattern(Pattern* p);
 void ListenPattern(Pattern* p);
+void DrawBomb(Entity *e);
 
 static TextureAtlas ta;
 
 float pickupTime;
 float pickupTimer = 0;
+
+
+Pattern* test = new Pattern {
+      (Beat){.count = 1, .subdivision = QUARTER},
+      (Beat){.count = 1, .subdivision = QUARTER},
+      (Beat){.count = 1, .subdivision = QUARTER},
+      (Beat){.count = 1, .subdivision = QUARTER},
+  };
+
 
 int main() {
   SetTraceLogLevel(LOG_WARNING);
@@ -32,7 +42,7 @@ int main() {
   InitAudioDevice();
 
   l->Info("Hello, Minijam!");
-  g->tempo = 180;
+  g->tempo = 108;
   g->lastQuarter = 0;
   g->currentQuarter = 0;
   g->spawnedThisBeat = false;
@@ -103,11 +113,12 @@ void Update(float deltaTime) {
 
   if (g->spawnedThisBeat == false) {
     if (g->currentQuarter == 1) {
-      Entity* e = GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
+      Entity* e = GetSpriteEntity(points[0], DrawBomb, AnimationState::PAUSED,
                       ta.GetTexture("bomb1"));
 
       e->mimic = MimicPattern;
       e->listen = ListenPattern;
+      e->pattern = test;
       g->spawnedThisBeat = true;
 
       return;
@@ -115,11 +126,11 @@ void Update(float deltaTime) {
 
     if ((g->currentQuarter - 1) % 16 == 0) {
 
-      Entity* e = GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
+      Entity* e = GetSpriteEntity(points[0], DrawBomb, AnimationState::PAUSED,
                       ta.GetTexture("bomb1"));
       e->mimic = MimicPattern;
       e->listen = ListenPattern;
-
+      e->pattern = test;
       g->spawnedThisBeat = true;
       return;
     }
@@ -216,12 +227,6 @@ void Draw() {
     }
   }
 
-  DrawTextureRec(ta.GetTexture("wireSheet"), Rectangle {
-    0, 0,
-    (float)ta.GetTexture("wireSheet").width / 8, (float)ta.GetTexture("wireSheet").height
-
-  }, {200, 100}, WHITE);
-
   EndDrawing();
 
 
@@ -275,7 +280,7 @@ void DrawBomb(Entity *e) {
         0, 0,
         (float)wireSheet.width / 8, (float)wireSheet.height
       },
-      { e->position.x + (20 * count), e->position.y + (20 * count) },
+      { (e->position.x - 150) + (60 * count), e->position.y - 135 },
       WHITE
     );
 

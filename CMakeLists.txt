@@ -14,6 +14,7 @@ set(SRC
     src/Rhythm.cpp
     src/Level.cpp
 	src/TextureAtlas.cpp
+    src/SFXAtlas.cpp
     src/Rhythm.cpp
     src/Scoring.cpp
 )

@@ -4,11 +4,11 @@
 #define GOOD_THRESHOLD 0.0825
 
 enum Accuracy {
-    NONE,
     MISS,
     GOOD,
 };
 
 Accuracy getBeatAccuracy();
+int countGoodClicks();
 
 #endif

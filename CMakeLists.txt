@@ -15,6 +15,7 @@ set(SRC
     src/Level.cpp
 	src/TextureAtlas.cpp
     src/Rhythm.cpp
+    src/Scoring.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

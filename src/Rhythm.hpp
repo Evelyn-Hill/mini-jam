@@ -20,6 +20,11 @@ struct Pattern {
   std::vector<Beat> rhythm;
   float time;
 
+  Pattern(std::initializer_list<Beat> beats) {
+    rhythm = {beats};
+    time = 0;
+  }
+
   Pattern(const Pattern &other) {
     rhythm = std::move(other.rhythm);
     time = other.time;

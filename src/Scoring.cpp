@@ -29,3 +29,13 @@ Accuracy getBeatAccuracy() {
     return Accuracy::MISS;
   }
 }
+
+int countGoodClicks() {
+  int result = 0;
+  for (auto a : g->clicks) {
+    if (a != MISS) {
+      result += 1;
+    }
+  }
+  return result;
+}

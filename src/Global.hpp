@@ -3,6 +3,7 @@
 #include "Level.hpp"
 #include "Log.hpp"
 #include "Types.hpp"
+#include "Scoring.hpp"
 
 struct Entity;
 
@@ -10,8 +11,9 @@ struct Global {
   std::vector<Entity *> entities;
   Music music;
   float tempo;
-  Level level;
+  Level *level;
   LevelSegment levelSegment;
+  std::vector<Accuracy> clicks;
 };
 
 extern Global *g;

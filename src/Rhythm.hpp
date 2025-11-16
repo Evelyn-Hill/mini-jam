@@ -26,8 +26,20 @@ struct Pattern {
   }
 
   Pattern(const Pattern &other) {
-    rhythm = std::move(other.rhythm);
+    rhythm = {};
+    for (auto b : other.rhythm) {
+      rhythm.push_back(b);
+    }
     time = other.time;
+  };
+
+  Pattern &operator=(const Pattern &other) {
+    rhythm = {};
+    for (auto b : other.rhythm) {
+      rhythm.push_back(b);
+    }
+    time = other.time;
+    return *this;
   };
 };
 

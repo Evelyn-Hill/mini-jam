@@ -26,7 +26,12 @@ void levelAppend(Level *lv, Pattern pattern) {
     lv->cap = newCap;
   }
 
-  lv->segments[lv->len] = pattern;
+  Pattern p;
+  for (auto b : pattern.rhythm) {
+    p.rhythm.push_back(b);
+  }
+  p.time = 0;
+  lv->segments[lv->len] = p;
   lv->len += 1;
 }
 

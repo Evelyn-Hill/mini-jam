@@ -18,8 +18,10 @@ void DrawTex(Entity *e);
 void FlushEntities();
 void DrawRotTex(vec2 pos, Texture2D tex, float time, float rotSpeed);
 void CountQuarters();
-void MimicPattern(Pattern *p);
-void ListenPattern(Pattern *p);
+void MimicPattern(Pattern* p);
+void ListenPattern(Pattern* p);
+void DrawBomb(Entity *e);
+void AllocatePatterns();
 
 static TextureAtlas ta;
 
@@ -37,9 +39,11 @@ int main() {
   g->currentQuarter = 0;
   g->spawnedThisBeat = false;
 
+  AllocatePatterns();
+
   g->music = LoadMusicStream("assets/save_it_redd.mp3");
 
-  g->level = (Level *)malloc(sizeof(Level));
+  g->level = new Level;
   levelInit(g->level);
 
   int totalSongBeats =

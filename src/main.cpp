@@ -10,6 +10,7 @@
 void Update();
 void Draw();
 void DrawRect(Entity* e);
+void DrawTex(Entity* e);
 void FlushEntities();
 
 
@@ -23,8 +24,9 @@ int main() {
 	l->Info("Hello, Minijam!");
 
 	ta.TALoadTexture("bgtest");
+	ta.TALoadTexture("bomb1");
 
-	GetRectangleEntity(points[0], {20, 20}, DrawRect, AnimationState::PLAYING);
+	GetSpriteEntity(points[0], DrawTex, AnimationState::PLAYING, ta.GetTexture("bomb1"));
 
 	while (!WindowShouldClose()) {
 		Update();
@@ -81,4 +83,13 @@ void DrawRect(Entity* e) {
 		},
 		RED
 	);
+}
+
+void DrawTex(Entity* e) {
+	DrawTextureEx(e->texture, 
+			   e->position - (e->size / 2), 
+
+			   0, 
+			   1, 
+			   WHITE);
 }

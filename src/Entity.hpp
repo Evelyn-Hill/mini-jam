@@ -4,6 +4,8 @@
 #include <raymath.h>
 #include <unordered_map>
 #include "Global.hpp"
+#include "TextureAtlas.hpp"
+#include "raylib.h"
 
 struct Entity;
 
@@ -26,12 +28,12 @@ bool skip[POINT_LEN] = {
 };
 
 vec2 points[POINT_LEN] {
-	{ -50, 350 },
-	{200, 350},
-	{900, 350},
-	{1350, 350},
-	{-50, 600},
-	{700, 600},
+	{ -300, 280 },
+	{200, 280},
+	{900, 280},
+	{1700, 280},
+	{-300, 520},
+	{700, 520},
 	{1150, 710},
 };
 
@@ -50,6 +52,7 @@ struct Entity {
 	float waitTimer = 0;
 	bool visible = true;
 	bool dead = false;
+	Texture2D texture;
 	
 
 	void Lerp(float delta) {
@@ -124,6 +127,27 @@ Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState default
 	};
 
 	
+	g->entities.push_back(e);
+	e->index = g->entities.size() - 1;
+	return e;
+}
+
+Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Texture2D tex) {
+	Entity* e = new Entity {
+		pos,
+		{0, 0},
+		pos,
+		{0, 0},
+		3.0,
+		0.0,
+		0,
+		defaultAnimState,
+		r
+	};
+
+	e->texture = tex;
+	e->size = vec2(tex.width, tex.height);
+
 	g->entities.push_back(e);
 	e->index = g->entities.size() - 1;
 	return e;

@@ -7,11 +7,18 @@
 
 struct Entity;
 
+enum PlaybackState {
+  NONE,
+  LISTEN,
+  MIMIC,
+};
+
 struct Global {
   std::vector<Entity *> entities;
   Music music;
   float tempo;
   Level *level;
+  PlaybackState state;
   Pattern *currentPattern;
   std::vector<Accuracy> clicks;
   int currentQuarter;

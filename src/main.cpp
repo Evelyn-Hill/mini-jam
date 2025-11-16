@@ -31,7 +31,6 @@ int main() {
   InitAudioDevice();
 
   l->Info("Hello, Minijam!");
-<<<<<<< HEAD
   g->tempo = 180;
   g->lastQuarter = 0;
   g->currentQuarter = 0;
@@ -250,8 +249,6 @@ void DrawTex(Entity *e) {
   vec2 origin = {(float)e->texture.width / 2, (float)e->texture.height / 2};
 
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
-<<<<<<< HEAD
-=======
 }
 
 
@@ -261,5 +258,4 @@ void CountQuarters() {
     g->spawnedThisBeat = false;
     g->lastQuarter = g->currentQuarter;
   }
->>>>>>> c935eb894c1fc8f8b74cc30284ade32728375ddf
 }

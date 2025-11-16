@@ -42,23 +42,16 @@ int main() {
 
   g->music = LoadMusicStream("assets/save_it_redd.mp3");
 
-  g->level = new Level();
-  levelAppend(g->level, 1);
+  g->level = (Level *)malloc(sizeof(Level));
+  levelInit(g->level);
 
   int totalSongBeats =
       round(GetMusicTimeLength(g->music) / secondsPerBeat(g->tempo));
   int measures = (totalSongBeats - 1) / 4;
 
   for (int i = 0; i < measures; i += 1) {
-    l->Info("inserting segment for measure ", i);
-    if (i % 2 == 0) {
-      levelAppend(g->level, *g->fourQuarters);
-    } else {
-      levelAppend(g->level, 4);
-    }
+    levelAppend(g->level, *g->fourQuarters);
   }
-
-  g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
 
   pickupTime = secondsPerBeat(g->tempo);
 
@@ -136,43 +129,21 @@ void Update(float deltaTime) {
 
   UpdateMusicStream(g->music);
 
-  g->level->time += deltaTime;
-
-  // first switch statement determines whether or not the current segment is
-  // still current
-  switch (g->levelSegment.tag) {
-  case LevelSegmentTag::PATTERN: {
-    Pattern &p = g->levelSegment.pattern;
-    p.time += deltaTime;
-    float patternDuration = duration(p, g->tempo);
-    if (p.time > patternDuration) {
-      g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
+  if (g->currentPattern != NULL) {
+    g->currentPattern->time += deltaTime;
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+      g->clicks.push_back(getBeatAccuracy());
     }
-    break;
-  }
-  case LevelSegmentTag::REST: {
-    RestSegment &r = g->levelSegment.rest;
-    r.time += deltaTime;
-    float restDuration = segmentGetDuration(g->levelSegment, g->tempo);
-    if (r.time > restDuration) {
-      g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
-    }
-    break;
-  }
-  }
-
-  if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-    g->clicks.push_back(getBeatAccuracy());
   }
 
   // PERF: potentially expensive to count all the beats that have passed in the
   // song and also loop through every time the player has clicked every frame
-  int passedBeats = levelGetPassedBeats(*g->level, g->tempo, GOOD_THRESHOLD);
-  int goodClicks = countGoodClicks();
-  if (passedBeats > goodClicks) {
-    // enter fail state
-    l->Error("missed a spot!");
-  }
+  // int passedBeats = levelGetPassedBeats(*g->level, g->tempo, GOOD_THRESHOLD);
+  // int goodClicks = countGoodClicks();
+  // if (passedBeats > goodClicks) {
+  //   // enter fail state
+  //   l->Error("missed a spot!");
+  // }
 }
 
 void Draw() {
@@ -220,9 +191,14 @@ void Draw() {
     }
   }
 
+  DrawTextureRec(ta.GetTexture("wireSheet"),
+                 Rectangle{0, 0, (float)ta.GetTexture("wireSheet").width / 8,
+                           (float)ta.GetTexture("wireSheet").height
+
+                 },
+                 {200, 100}, WHITE);
+
   EndDrawing();
-
-
 }
 
 void FlushEntities() {
@@ -253,7 +229,6 @@ void DrawTex(Entity *e) {
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
 }
 
-
 void DrawBomb(Entity *e) {
   Rectangle sr = {0, 0, (float)e->texture.width, (float)e->texture.height};
 
@@ -263,7 +238,7 @@ void DrawBomb(Entity *e) {
   vec2 origin = {(float)e->texture.width / 2, (float)e->texture.height / 2};
 
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
-  
+
   Texture2D wireSheet = ta.GetTexture("wireSheet");
   int count = 0;
   for (Beat b : e->pattern->rhythm) {
@@ -280,7 +255,6 @@ void DrawBomb(Entity *e) {
     count++;
   }
 }
-
 
 void CountQuarters() {
   g->currentQuarter = getBeat(g->music, QUARTER, g->tempo).beatNumber;
@@ -330,9 +304,7 @@ void AllocatePatterns() {
   });
 }
 
-void MimicPattern(Pattern* p) {
-  l->Info("Mimic");
-};
+void MimicPattern(Pattern *p) { l->Info("Mimic"); };
 
 void ListenPattern(Pattern* p) { 
   l->Info("Pattern");

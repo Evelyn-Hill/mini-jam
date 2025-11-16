@@ -16,15 +16,36 @@ Beat patternGetCurrentBeat(Pattern p, float tempo) {
   return p.rhythm[p.rhythm.size() - 1];
 }
 
+float patternGetBeatDistance(Pattern *p, float tempo) {
+  float time = duration(p->rhythm[0], tempo);
+  for (int i = 1; i < p->rhythm.size(); i += 1) {
+    if (time > p->time) {
+      Beat curr = p->rhythm[i - 1];
+      float untilBeatEnd = time - p->time;
+      float beatDuration = duration(curr, tempo);
+      if (untilBeatEnd > beatDuration / 2) {
+        return beatDuration - untilBeatEnd;
+      } else {
+        return untilBeatEnd;
+      }
+    }
+    Beat curr = p->rhythm[i];
+    time += duration(curr, tempo);
+  }
+  Beat end = p->rhythm[p->rhythm.size() - 1];
+  return p->time - time;
+}
+
 GetBeatResult getBeat(Music m, Subdivision subdivision, float tempo) {
   float timePlaying = GetMusicTimePlayed(m);
   float numBeats =
       timePlaying / (secondsPerBeat(tempo) * quarters(subdivision));
   int wholeBeats = floor(numBeats);
   float fracBeats = numBeats - wholeBeats;
-  return (GetBeatResult){.beatNumber = wholeBeats,
-                         .timeSinceBeat =
-                             fracBeats * duration(subdivision, tempo)};
+  return (GetBeatResult){
+      .beatNumber = wholeBeats,
+      .timeSinceBeat = fracBeats * duration(subdivision, tempo),
+  };
 }
 
 float duration(Pattern p, float tempo) {

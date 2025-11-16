@@ -2,60 +2,20 @@
 #define LEVEL_H
 
 #include "Rhythm.hpp"
-#include <vector>
-
-struct RestSegment {
-  int beats;
-  float time;
-};
-
-enum LevelSegmentTag {
-  PATTERN,
-  REST,
-};
-
-struct LevelSegment {
-  LevelSegmentTag tag;
-  union {
-    RestSegment rest;
-    Pattern pattern;
-  };
-
-  LevelSegment();
-  LevelSegment(int beats);
-  LevelSegment(Pattern pattern);
-  LevelSegment(const LevelSegment &other);
-  LevelSegment &operator=(const LevelSegment &other) {
-    tag = other.tag;
-    switch (tag) {
-    case PATTERN:
-      pattern = other.pattern;
-      break;
-    case REST:
-      rest = other.rest;
-      break;
-    }
-    return *this;
-  }
-  ~LevelSegment();
-};
+#include <cstddef>
 
 struct Level {
-  std::vector<LevelSegment> segments;
-  float time;
-
-  Level() : time(0) { segments = {}; }
+  Pattern *segments;
+  Pattern *current;
+  size_t len;
+  size_t cap;
 };
 
-LevelSegment levelGetCurrentSegment(Level l, float tempo);
-
-Level levelCreate();
-void levelDestroy(Level *l);
-void levelAppend(Level *l, Pattern p);
-void levelAppend(Level *l, int restBeats);
-int levelGetPassedBeats(Level l, float tempo, float threshold);
-
-float segmentGetDuration(LevelSegment s, float tempo);
-int segmentGetQuarters(LevelSegment s);
+void levelInit(Level *lv);
+void levelInit(Level *lv, int cap);
+void levelAppend(Level *lv, Pattern p);
+bool levelIsAtEnd(Level *lv);
+Pattern *levelPeek(Level *lv);
+Pattern *levelAdvance(Level *lv);
 
 #endif

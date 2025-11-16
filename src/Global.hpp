@@ -12,7 +12,7 @@ struct Global {
   Music music;
   float tempo;
   Level *level;
-  LevelSegment levelSegment;
+  Pattern *currentPattern;
   std::vector<Accuracy> clicks;
   int currentQuarter;
   int lastQuarter;

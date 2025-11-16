@@ -47,12 +47,13 @@ struct Pattern {
   };
 };
 
-Beat patternGetCurrentBeat(Pattern p, float tempo);
-
 struct GetBeatResult {
   int beatNumber;
   float timeSinceBeat;
 };
+
+Beat patternGetCurrentBeat(Pattern p, float tempo);
+float patternGetBeatDistance(Pattern *p, float tempo);
 
 float duration(Pattern p, float tempo);
 float duration(Beat b, float tempo);

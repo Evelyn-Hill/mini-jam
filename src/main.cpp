@@ -41,6 +41,8 @@ int main() {
   g->currentQuarter = 0;
   g->spawnedThisBeat = false;
 
+  AllocatePatterns();
+
   g->music = LoadMusicStream("assets/save_it_redd.mp3");
 
   AllocatePatterns();

@@ -24,6 +24,11 @@ struct Pattern {
   std::vector<Beat> rhythm;
   float time;
 
+  Pattern() {
+    rhythm = {};
+    time = 0;
+  }
+
   Pattern(std::initializer_list<Beat> beats) {
     rhythm = {beats};
     time = 0;

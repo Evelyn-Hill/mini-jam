@@ -1,10 +1,9 @@
 #pragma once
+#include "Assert.hpp"
 #include "Entity.hpp"
 #include "Level.hpp"
 #include "Log.hpp"
-#include <vector>
-
-struct Entity;
+#include "Types.hpp"
 
 struct Global {
   std::vector<Entity *> entities;

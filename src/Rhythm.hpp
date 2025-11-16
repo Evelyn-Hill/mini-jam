@@ -26,7 +26,7 @@ struct Pattern {
   };
 };
 
-Subdivision patternGetCurrentSubdivision(Pattern p, float tempo);
+Beat patternGetCurrentBeat(Pattern p, float tempo);
 
 struct GetBeatResult {
   int beatNumber;

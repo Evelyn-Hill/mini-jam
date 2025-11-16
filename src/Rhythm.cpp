@@ -4,16 +4,16 @@
 #include <cassert>
 #include <cmath>
 
-Subdivision patternGetCurrentSubdivision(Pattern p, float tempo) {
+Beat patternGetCurrentBeat(Pattern p, float tempo) {
   float time = duration(p.rhythm[0], tempo);
   for (int i = 1; i < p.rhythm.size(); i += 1) {
     if (time > p.time) {
-      return p.rhythm[i - 1].subdivision;
+      return p.rhythm[i - 1];
     }
     Beat beat = p.rhythm[i];
     time += duration(beat, tempo);
   }
-  return p.rhythm[p.rhythm.size() - 1].subdivision;
+  return p.rhythm[p.rhythm.size() - 1];
 }
 
 GetBeatResult getBeat(Music m, Subdivision subdivision, float tempo) {

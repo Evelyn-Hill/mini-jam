@@ -22,6 +22,7 @@ void CountQuarters();
 void MimicPattern(Pattern* p);
 void ListenPattern(Pattern* p);
 void DrawBomb(Entity *e);
+void AllocatePatterns();
 
 static TextureAtlas ta;
 //static SFXAtlas sfxa;
@@ -42,7 +43,9 @@ int main() {
 
   g->music = LoadMusicStream("assets/save_it_redd.mp3");
 
-  g->level = (Level *)malloc(sizeof(Level));
+  AllocatePatterns();
+
+  g->level = new Level();
   levelInit(g->level);
 
   int totalSongBeats =

@@ -4,17 +4,13 @@
 #include <cassert>
 #include <cmath>
 
-Beat patternGetCurrentBeat(Pattern p, float tempo) {
-  float time = duration(p.rhythm[0], tempo);
-  for (int i = 1; i < p.rhythm.size(); i += 1) {
-    if (time > p.time) {
-      return p.rhythm[i - 1];
-    }
-    Beat beat = p.rhythm[i];
-    time += duration(beat, tempo);
+float patternGetBeatDistance(Pattern *p, float tempo) {
+  Beat last = p->rhythm[p->rhythm.size() - 1];
+  float patternDuration = duration(*p, tempo);
+  float lastBeatDuration = duration(last, tempo);
+  if (patternDuration - lastBeatDuration < p->time) {
+    return -1;
   }
-  return p.rhythm[p.rhythm.size() - 1];
-}
 
 float patternGetBeatDistance(Pattern *p, float tempo) {
   Beat last = p->rhythm[p->rhythm.size() - 1];
@@ -40,6 +36,19 @@ float patternGetBeatDistance(Pattern *p, float tempo) {
     time += duration(curr, tempo);
   }
   return -1;
+}
+
+int patternGetPassedBeats(Pattern *p, float tempo, float threshold) {
+  int result = 0;
+  float time = 0;
+  for (auto e : p->rhythm) {
+    if (time > p->time - threshold) {
+      break;
+    }
+    result += 1;
+    time += duration(e, tempo);
+  }
+  return result;
 }
 
 GetBeatResult getBeat(Music m, Subdivision subdivision, float tempo) {

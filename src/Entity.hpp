@@ -148,15 +148,16 @@ struct Entity {
 			lastVisited++;
 
 			if (lastVisited == mimicPoint && !mimicd) {
+        pattern->time = 0;
 				g->currentPattern = pattern;
 				g->state = PlaybackState::MIMIC;
 				mimicd = true;
 			}
 
 			if (lastVisited == playerPoint && !listened) {
+        pattern->time = 0;
 				g->currentPattern = pattern;
 				g->state = PlaybackState::LISTEN;
-				l->Info("E Liste");
 				listened = true;
 			}
 		}

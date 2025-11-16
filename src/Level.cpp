@@ -36,6 +36,29 @@ void levelAppend(Level *l, int beats) {
   l->segments.push_back(LevelSegment(beats));
 }
 
+int levelGetPassedBeats(Level l, float tempo) {
+  int result = 0;
+  float time = 0;
+  for (auto s : l.segments) {
+    if (time > l.time) {
+      break;
+    }
+    if (s.tag == LevelSegmentTag::REST) {
+      time += segmentGetDuration(s, tempo);
+      continue;
+    }
+    for (auto b : s.pattern.rhythm) {
+      if (time > l.time) {
+        break;
+      }
+
+      result += 1;
+      time += duration(b, tempo);
+    }
+  }
+  return result;
+}
+
 float segmentGetDuration(LevelSegment s, float tempo) {
   float result;
   switch (s.tag) {

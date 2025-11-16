@@ -78,6 +78,7 @@ Level levelCreate();
 void levelDestroy(Level *l);
 void levelAppend(Level *l, Pattern p);
 void levelAppend(Level *l, int restBeats);
+int levelGetPassedBeats(Level l, float tempo);
 
 float segmentGetDuration(LevelSegment s, float tempo);
 int segmentGetQuarters(LevelSegment s);

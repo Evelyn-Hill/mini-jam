@@ -150,26 +150,37 @@ void Update(float deltaTime) {
         g->state = PlaybackState::NONE;
         g->currentPattern = NULL;
         return;
-      } 
+      }
 
       if (patternGetBeatDistance(g->currentPattern, g->tempo) < 0.017) {
         if (g->currentEntity->playedSound) {
           return;
         }
-        //l->Info("beat : ", patternGetBeatDistance(g->currentPattern, g->tempo));
+        // l->Info("beat : ", patternGetBeatDistance(g->currentPattern,
+        // g->tempo));
         PlaySound(click);
-        g->currentEntity->playedSound = true; 
+        g->currentEntity->playedSound = true;
       }
 
       if (patternGetBeatDistance(g->currentPattern, g->tempo) > 0.02) {
         g->currentEntity->playedSound = false;
       }
-
     }
 
     if (g->state == PlaybackState::LISTEN) {
       auto patternDuration = duration(*g->currentPattern, g->tempo);
       if (g->currentPattern->time >= patternDuration) {
+        int patternBeats = g->currentPattern->rhythm.size();
+        int goodClicks = 0;
+        for (auto click : g->patternClicks) {
+          if (click == Accuracy::GOOD) {
+            goodClicks += 1;
+          }
+        }
+        if (goodClicks < patternBeats) {
+          l->Error("get good (passed beats: ", patternBeats, ", good beats: ", goodClicks, ")");
+        }
+
         g->clicks.append_range(g->patternClicks);
         g->patternClicks.clear();
         g->state = PlaybackState::NONE;
@@ -178,18 +189,9 @@ void Update(float deltaTime) {
       }
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        g->patternClicks.push_back(getBeatAccuracy());
-      }
-
-      int passedBeats = patternGetPassedBeats(g->currentPattern, g->tempo, GOOD_THRESHOLD);
-      int goodClicks = 0;
-      for (auto click : g->patternClicks) {
-        if (click == Accuracy::GOOD) {
-          goodClicks += 1;
-        }
-      }
-      if (goodClicks < passedBeats) {
-        l->Error("get good (passed beats: ", passedBeats, " at ", g->currentPattern->time, " seconds");
+        Accuracy click = getBeatAccuracy();
+        l->Info(click);
+        g->patternClicks.push_back(click);
       }
     }
   }

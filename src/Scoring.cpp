@@ -5,6 +5,8 @@
 Accuracy getBeatAccuracy() {
   float beatDistance = patternGetBeatDistance(g->currentPattern, g->tempo);
 
+  l->Info("beat distance: ", beatDistance, ", threshold: ", GOOD_THRESHOLD);
+
   if (beatDistance < GOOD_THRESHOLD) {
     return Accuracy::GOOD;
   } else {

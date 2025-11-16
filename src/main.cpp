@@ -137,45 +137,43 @@ void Update(float deltaTime) {
 
   if (g->currentPattern != NULL) {
     g->currentPattern->time += deltaTime;
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-      g->clicks.push_back(getBeatAccuracy());
-    }
-  }
-  
-  if (g->currentPattern != NULL) {
     if (g->state == PlaybackState::MIMIC) {
       auto patternDuration = duration(*g->currentPattern, g->tempo);
-      g->currentPattern->time += deltaTime; 
       if (g->currentPattern->time >= patternDuration) {
         g->state = PlaybackState::NONE;
         g->currentPattern = NULL;
         return;
       }
 
-      l->Info("Mimic"); 
+      // l->Info("Mimic"); 
     }
 
     if (g->state == PlaybackState::LISTEN) {
       auto patternDuration = duration(*g->currentPattern, g->tempo);
-      g->currentPattern->time += deltaTime; 
       if (g->currentPattern->time >= patternDuration) {
+        g->clicks.append_range(g->patternClicks);
+        g->patternClicks.clear();
         g->state = PlaybackState::NONE;
         g->currentPattern = NULL;
         return;
       }
 
-      l->Info("Listen"); 
+      if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        g->patternClicks.push_back(getBeatAccuracy());
+      }
+
+      int passedBeats = patternGetPassedBeats(g->currentPattern, g->tempo, GOOD_THRESHOLD);
+      int goodClicks = 0;
+      for (auto click : g->patternClicks) {
+        if (click == Accuracy::GOOD) {
+          goodClicks += 1;
+        }
+      }
+      if (goodClicks < passedBeats) {
+        l->Error("get good (passed beats: ", passedBeats, " at ", g->currentPattern->time, " seconds");
+      }
     }
   }
-
-  // PERF: potentially expensive to count all the beats that have passed in the
-  // song and also loop through every time the player has clicked every frame
-  // int passedBeats = levelGetPassedBeats(*g->level, g->tempo, GOOD_THRESHOLD);
-  // int goodClicks = countGoodClicks();
-  // if (passedBeats > goodClicks) {
-  //   // enter fail state
-  //   l->Error("missed a spot!");
-  // }
 }
 
 void Draw() {

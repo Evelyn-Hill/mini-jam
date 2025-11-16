@@ -21,6 +21,7 @@ struct Global {
   PlaybackState state;
   Pattern *currentPattern;
   std::vector<Accuracy> clicks;
+  std::vector<Accuracy> patternClicks;
   int currentQuarter;
   int lastQuarter;
   bool spawnedThisBeat;

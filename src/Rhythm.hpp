@@ -57,8 +57,8 @@ struct GetBeatResult {
   float timeSinceBeat;
 };
 
-Beat patternGetCurrentBeat(Pattern p, float tempo);
 float patternGetBeatDistance(Pattern *p, float tempo);
+int patternGetPassedBeats(Pattern *p, float tempo, float threshold);
 
 float duration(Pattern p, float tempo);
 float duration(Beat b, float tempo);

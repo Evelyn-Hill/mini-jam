@@ -17,6 +17,11 @@ struct Global {
   int currentQuarter;
   int lastQuarter;
   bool spawnedThisBeat;
+  Pattern *fourQuarters;
+  Pattern *twoHalves;
+  Pattern *oneAndTwoThreeAndFour;
+  Pattern *oneTwoAndThreeFour;
+  Pattern *oneTwoAndThreeAndFour;
 };
 
 extern Global *g;

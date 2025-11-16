@@ -11,6 +11,7 @@ set(SRC
 	src/main.cpp
 	src/Global.cpp
     src/Rhythm.cpp
+    src/Level.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

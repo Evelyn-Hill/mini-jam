@@ -17,35 +17,49 @@ enum LevelSegmentTag {
 struct LevelSegment {
   LevelSegmentTag tag;
   union {
-    Pattern pattern;
     RestSegment rest;
+    Pattern pattern;
   };
 
-  LevelSegment(int beats) : tag(LevelSegmentTag::REST), rest({ .beats = beats, .time = 0 }) {};
+  LevelSegment() : tag(REST), rest({.beats = 0, .time = 0}) {};
+
+  LevelSegment(Pattern p) : tag(PATTERN) {
+    pattern.rhythm = p.rhythm;
+    pattern.time = p.time;
+  }
+
+  LevelSegment(int beats) : tag(REST) {
+    rest = {
+        .beats = beats,
+        .time = 0,
+    };
+  }
 
   LevelSegment(const LevelSegment &other) : tag(other.tag) {
-    if (tag == LevelSegmentTag::PATTERN) {
+    switch (tag) {
+    case PATTERN:
       pattern = other.pattern;
-    } else {
+      break;
+    case REST:
       rest = other.rest;
+      break;
     }
   }
 
-  LevelSegment& operator=(const LevelSegment& other) {
-    if (this == &other) {
-      return *this;
-    }
-
-    switch (other.tag) {
-      case LevelSegmentTag::PATTERN:
-        pattern = other.pattern;
-        break;
-      case LevelSegmentTag::REST:
-        rest = other.rest;
-        break;
+  LevelSegment &operator=(const LevelSegment &other) {
+    tag = other.tag;
+    switch (tag) {
+    case PATTERN:
+      pattern = other.pattern;
+      break;
+    case REST:
+      rest = other.rest;
+      break;
     }
     return *this;
-  };
+  }
+
+  ~LevelSegment() {};
 };
 
 struct Level {

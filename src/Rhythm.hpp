@@ -19,6 +19,11 @@ struct Beat {
 struct Pattern {
   std::vector<Beat> rhythm;
   float time;
+
+  Pattern(const Pattern &other) {
+    rhythm = std::move(other.rhythm);
+    time = other.time;
+  };
 };
 
 Subdivision patternGetCurrentSubdivision(Pattern p, float tempo);

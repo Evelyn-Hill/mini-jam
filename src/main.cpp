@@ -4,6 +4,7 @@
 #include "Rhythm.hpp"
 #include "Scoring.hpp"
 #include "TextureAtlas.hpp"
+#include "SFXAtlas.hpp"
 #include <iostream>
 #include <raygui.h>
 #include <raylib.h>
@@ -18,10 +19,12 @@ void DrawTex(Entity *e);
 void FlushEntities();
 void DrawRotTex(vec2 pos, Texture2D tex, float time, float rotSpeed);
 void CountQuarters();
-void MimicPattern(Pattern *p);
-void ListenPattern(Pattern *p);
+void MimicPattern(Pattern* p);
+void ListenPattern(Pattern* p);
+void DrawBomb(Entity *e);
 
 static TextureAtlas ta;
+static SFXAtlas sfxa;
 
 float pickupTime;
 float pickupTimer = 0;
@@ -32,7 +35,7 @@ int main() {
   InitAudioDevice();
 
   l->Info("Hello, Minijam!");
-  g->tempo = 180;
+  g->tempo = 108;
   g->lastQuarter = 0;
   g->currentQuarter = 0;
   g->spawnedThisBeat = false;
@@ -96,11 +99,12 @@ void Update(float deltaTime) {
 
   if (g->spawnedThisBeat == false) {
     if (g->currentQuarter == 1) {
-      Entity *e = GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
-                                  ta.GetTexture("bomb1"));
+      Entity* e = GetSpriteEntity(points[0], DrawBomb, AnimationState::PAUSED,
+                      ta.GetTexture("bomb1"));
 
       e->mimic = MimicPattern;
       e->listen = ListenPattern;
+      e->pattern = test;
       g->spawnedThisBeat = true;
 
       return;
@@ -108,11 +112,11 @@ void Update(float deltaTime) {
 
     if ((g->currentQuarter - 1) % 16 == 0) {
 
-      Entity *e = GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
-                                  ta.GetTexture("bomb1"));
+      Entity* e = GetSpriteEntity(points[0], DrawBomb, AnimationState::PAUSED,
+                      ta.GetTexture("bomb1"));
       e->mimic = MimicPattern;
       e->listen = ListenPattern;
-
+      e->pattern = test;
       g->spawnedThisBeat = true;
       return;
     }
@@ -238,10 +242,15 @@ void DrawBomb(Entity *e) {
   Texture2D wireSheet = ta.GetTexture("wireSheet");
   int count = 0;
   for (Beat b : e->pattern->rhythm) {
-    DrawTextureRec(
-        wireSheet,
-        Rectangle{0, 0, (float)wireSheet.width / 8, (float)wireSheet.height},
-        {e->position.x + (20 * count), e->position.y + (20 * count)}, WHITE);
+      DrawTextureRec(
+      wireSheet,
+      Rectangle {
+        0, 0,
+        (float)wireSheet.width / 8, (float)wireSheet.height
+      },
+      { (e->position.x - 150) + (60 * count), e->position.y - 135 },
+      WHITE
+    );
 
     count++;
   }
@@ -297,4 +306,6 @@ void AllocatePatterns() {
 
 void MimicPattern(Pattern *p) { l->Info("Mimic"); };
 
-void ListenPattern(Pattern *p) { l->Info("Pattern"); };
+void ListenPattern(Pattern* p) { 
+  l->Info("Pattern");
+};

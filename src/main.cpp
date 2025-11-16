@@ -4,6 +4,7 @@
 #include "Rhythm.hpp"
 #include "Scoring.hpp"
 #include "TextureAtlas.hpp"
+#include "SFXAtlas.hpp"
 #include <iostream>
 #include <raygui.h>
 #include <raylib.h>
@@ -23,18 +24,10 @@ void ListenPattern(Pattern* p);
 void DrawBomb(Entity *e);
 
 static TextureAtlas ta;
+static SFXAtlas sfxa;
 
 float pickupTime;
 float pickupTimer = 0;
-
-
-Pattern* test = new Pattern {
-      (Beat){.count = 1, .subdivision = QUARTER},
-      (Beat){.count = 1, .subdivision = QUARTER},
-      (Beat){.count = 1, .subdivision = QUARTER},
-      (Beat){.count = 1, .subdivision = QUARTER},
-  };
-
 
 int main() {
   SetTraceLogLevel(LOG_WARNING);
@@ -341,6 +334,6 @@ void MimicPattern(Pattern* p) {
   l->Info("Mimic");
 };
 
-void ListenPattern(Pattern* p){
+void ListenPattern(Pattern* p) { 
   l->Info("Pattern");
 };

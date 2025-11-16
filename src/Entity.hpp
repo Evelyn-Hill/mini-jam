@@ -19,6 +19,8 @@ enum EntityType : u8 {
 };
 
 typedef void (*Render)(Entity* e);
+typedef void (*Mimic)(Pattern* p);
+typedef void (*Listen)(Pattern* p);
 
 const int POINT_LEN = 7;
 
@@ -44,6 +46,9 @@ vec2 points[POINT_LEN] {
 bool skip[POINT_LEN] = {
 	false, false, false, true, false, false, false
 };
+
+int mimicPoint = 2;
+int playerPoint = 5;
 
 vec2 bezierControlPoint = { 1000, 200 };
 int bezierPoint = 5;
@@ -83,6 +88,13 @@ struct Entity {
 
 	int pickupIntervalBeats = 1;
 	int pickupCount = 0;
+	
+	Pattern* pattern;
+	Mimic mimic;
+	Listen listen;
+
+	bool mimicd = false;
+	bool listened = false;
 
 	void Lerp(float delta) {
 		// Replace this 1 with the eventual beat time.
@@ -117,6 +129,7 @@ struct Entity {
 			return;
 		}
 
+
 		if (animationTimer < animationDuration) {
 			animationTimer += delta;
 			if (lastVisited != bezierPoint) {
@@ -131,6 +144,16 @@ struct Entity {
 			animationTimer = 0;
 			startingPosition = destination;
 			lastVisited++;
+
+			if (lastVisited == mimicPoint && !mimicd) {
+				mimic(pattern);
+				mimicd = true;
+			}
+
+			if (lastVisited == playerPoint && !listened) {
+				listen(pattern);
+				listened = true;
+			}
 		}
 	}
 
@@ -201,7 +224,7 @@ Entity* GetRectangleEntity(vec2 pos, vec2 size, Render r, AnimationState default
 }
 
 Entity* GetSpriteEntity(vec2 pos, Render r, AnimationState defaultAnimState, Texture2D tex, float rotSpeed = 0, int drawLayer = 0) {
-	Entity* e = new Entity;
+	Entity* e = new Entity();
 	e->position = pos;
 	e->size = vec2(tex.width, tex.height);
 	e->startingPosition = pos;	

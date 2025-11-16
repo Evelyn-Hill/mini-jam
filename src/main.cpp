@@ -24,7 +24,7 @@ void ListenPattern(Pattern* p);
 void DrawBomb(Entity *e);
 
 static TextureAtlas ta;
-static SFXAtlas sfxa;
+//static SFXAtlas sfxa;
 
 float pickupTime;
 float pickupTimer = 0;
@@ -104,7 +104,7 @@ void Update(float deltaTime) {
 
       e->mimic = MimicPattern;
       e->listen = ListenPattern;
-      e->pattern = test;
+      e->pattern = g->fourQuarters;
       g->spawnedThisBeat = true;
 
       return;
@@ -116,7 +116,7 @@ void Update(float deltaTime) {
                       ta.GetTexture("bomb1"));
       e->mimic = MimicPattern;
       e->listen = ListenPattern;
-      e->pattern = test;
+      e->pattern = g->fourQuarters;
       g->spawnedThisBeat = true;
       return;
     }

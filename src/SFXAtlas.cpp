@@ -21,6 +21,8 @@ SFXAtlas::SFXAtlas() {
 	Load("wasntyourbest");
 }
 
+SFXAtlas::~SFXAtlas () {};
+
 void SFXAtlas::Load(std::string name) {
 	std::string assetDir = "assets/";
 	std::string ext = ".wav";

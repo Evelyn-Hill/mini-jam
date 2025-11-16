@@ -1,4 +1,4 @@
-#include "rhythm.hpp"
+#include "Rhythm.hpp"
 #include "Global.hpp"
 #include "raylib.h"
 #include <cassert>

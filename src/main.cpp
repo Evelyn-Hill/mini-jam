@@ -1,6 +1,8 @@
 #include <iostream>
 #include <raylib.h>
 #include <raygui.h>
+#include <unordered_map>
+#include <utility>
 #include "Entity.hpp"
 #include "Global.hpp"
 #include "TextureAtlas.hpp"
@@ -8,19 +10,11 @@
 void Update();
 void Draw();
 void DrawRect(Entity* e);
+void FlushEntities();
 
-const int POINT_LEN = 7;
 
 static TextureAtlas ta;
-static vec2 points[POINT_LEN] {
-	{ -50, 350 },
-	{200, 350},
-	{900, 350},
-	{1500, 350},
-	{-50, 600},
-	{700, 600},
-	{1150, 710},
-};
+
 
 int main() {
 	SetTraceLogLevel(LOG_WARNING);
@@ -28,13 +22,14 @@ int main() {
 	
 	l->Info("Hello, Minijam!");
 
-	ta.TALoadTexture("conveyorbelt");
+	ta.TALoadTexture("bgtest");
 
 	GetRectangleEntity(points[0], {20, 20}, DrawRect, AnimationState::PLAYING);
 
 	while (!WindowShouldClose()) {
 		Update();
 		Draw();
+		FlushEntities();
 	}
 
 	CloseWindow();
@@ -43,9 +38,8 @@ int main() {
 
 void Update() {
 	for (Entity* e : g->entities) {
-		e->Lerp(GetFrameTime(), points, POINT_LEN);
+		e->Lerp(GetFrameTime());
 	}
-
 }
 
 
@@ -54,13 +48,8 @@ void Draw() {
 
 	ClearBackground(BLACK);
 	
-	DrawTexture(ta.GetTexture("conveyorbelt"), 0, 0, WHITE);
+	DrawTexture(ta.GetTexture("bgtest"), 0, 0, WHITE);
 	for (Entity* e : g->entities) {
-		if (e->dead) {
-			delete g->entities[e->index];
-			continue;
-		}
-
 		if (!e->visible) {
 			continue;
 		}
@@ -71,6 +60,15 @@ void Draw() {
 	EndDrawing();
 }
 
+
+void FlushEntities() {
+	for (Entity* e : g->entities) {
+		if (e->dead) {
+			DeleteEntity(e);
+			continue;
+		}
+	}
+}
 
 void DrawRect(Entity* e) { 		
 

@@ -84,7 +84,9 @@ struct Entity {
 	int currentHalf = 0;
 
 	int lastWhole = 0;
-	int currentWhole = 0;	
+	int currentWhole = 0;
+
+	bool playedSound = false;
 
 	int pickupIntervalBeats = 1;
 	int pickupCount = 0;

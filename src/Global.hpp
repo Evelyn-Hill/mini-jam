@@ -30,6 +30,7 @@ struct Global {
   Pattern *oneAndTwoThreeAndFour;
   Pattern *oneTwoAndThreeFour;
   Pattern *oneTwoAndThreeAndFour;
+  Entity* currentEntity;
 };
 
 extern Global *g;

@@ -12,6 +12,14 @@ float patternGetBeatDistance(Pattern *p, float tempo) {
     return -1;
   }
 
+float patternGetBeatDistance(Pattern *p, float tempo) {
+  Beat last = p->rhythm[p->rhythm.size() - 1];
+  float patternDuration = duration(*p, tempo);
+  float lastBeatDuration = duration(last, tempo);
+  if (patternDuration - lastBeatDuration < p->time) {
+    return -1;
+  }
+
   float time = duration(p->rhythm[0], tempo);
   for (int i = 1; i < p->rhythm.size(); i += 1) {
     if (time > p->time) {

@@ -27,13 +27,18 @@ void AllocatePatterns();
 static TextureAtlas ta;
 //static SFXAtlas sfxa;
 
+Sound click;
+
 float pickupTime;
 float pickupTimer = 0;
+
+bool mimicdBeat = false;
 
 int main() {
   SetTraceLogLevel(LOG_WARNING);
   InitWindow(1280, 720, "Hello, World!");
   InitAudioDevice();
+  SetTargetFPS(60);
 
   l->Info("Hello, Minijam!");
   g->tempo = 108;
@@ -60,7 +65,7 @@ int main() {
   }
 
   pickupTime = secondsPerBeat(g->tempo);
-
+  click = LoadSoundFromWave(LoadWave("assets/click.wav"));
   PlayMusicStream(g->music);
 
   ta.TALoadTexture("bomb1");
@@ -112,6 +117,7 @@ void Update(float deltaTime) {
       e->listen = ListenPattern;
       e->pattern = g->fourQuarters;
       g->spawnedThisBeat = true;
+      g->currentEntity = e;
 
       return;
     }
@@ -124,6 +130,7 @@ void Update(float deltaTime) {
       e->listen = ListenPattern;
       e->pattern = g->fourQuarters;
       g->spawnedThisBeat = true;
+      g->currentEntity = e;
       return;
     }
   }
@@ -143,9 +150,21 @@ void Update(float deltaTime) {
         g->state = PlaybackState::NONE;
         g->currentPattern = NULL;
         return;
+      } 
+
+      if (patternGetBeatDistance(g->currentPattern, g->tempo) < 0.017) {
+        if (g->currentEntity->playedSound) {
+          return;
+        }
+        //l->Info("beat : ", patternGetBeatDistance(g->currentPattern, g->tempo));
+        PlaySound(click);
+        g->currentEntity->playedSound = true; 
       }
 
-      // l->Info("Mimic"); 
+      if (patternGetBeatDistance(g->currentPattern, g->tempo) > 0.02) {
+        g->currentEntity->playedSound = false;
+      }
+
     }
 
     if (g->state == PlaybackState::LISTEN) {

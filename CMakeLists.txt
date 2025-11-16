@@ -11,7 +11,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SRC 
 	src/main.cpp
 	src/Global.cpp
+    src/Rhythm.cpp
+    src/Level.cpp
 	src/TextureAtlas.cpp
+    src/Rhythm.cpp
+    src/Level.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

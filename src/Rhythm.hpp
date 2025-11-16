@@ -14,6 +14,10 @@ enum Subdivision {
 struct Beat {
   int count;
   Subdivision subdivision;
+
+  Beat() : count(1), subdivision(QUARTER) {};
+  Beat(Subdivision s) : count(1), subdivision(s) {};
+  Beat(int count, Subdivision s) : count(count), subdivision(s) {};
 };
 
 struct Pattern {

@@ -1,9 +1,9 @@
 #include "Entity.hpp"
 #include "Global.hpp"
 #include "Level.hpp"
-#include "TextureAtlas.hpp"
-#include "Scoring.hpp"
 #include "Rhythm.hpp"
+#include "Scoring.hpp"
+#include "TextureAtlas.hpp"
 #include <iostream>
 #include <raygui.h>
 #include <raylib.h>
@@ -24,7 +24,6 @@ static TextureAtlas ta;
 float pickupTime;
 float pickupTimer = 0;
 
-
 int main() {
   SetTraceLogLevel(LOG_WARNING);
   InitWindow(1280, 720, "Hello, World!");
@@ -40,34 +39,21 @@ int main() {
 
   g->level = new Level();
   levelAppend(g->level, 1);
-  l->Info("created level");
 
   int totalSongBeats =
       round(GetMusicTimeLength(g->music) / secondsPerBeat(g->tempo));
-  l->Info("song has ", totalSongBeats, " beats");
   int measures = (totalSongBeats - 1) / 4;
-  l->Info("song has ", measures, " measures");
-
-  Pattern fourQuarterNotes = {
-      (Beat){.count = 1, .subdivision = QUARTER},
-      (Beat){.count = 1, .subdivision = QUARTER},
-      (Beat){.count = 1, .subdivision = QUARTER},
-      (Beat){.count = 1, .subdivision = QUARTER},
-  };
-  l->Info("created pattern with 4 quarter notes");
 
   for (int i = 0; i < measures; i += 1) {
     l->Info("inserting segment for measure ", i);
     if (i % 2 == 0) {
-      levelAppend(g->level, fourQuarterNotes);
+      levelAppend(g->level, *g->fourQuarters);
     } else {
       levelAppend(g->level, 4);
     }
   }
-  l->Info("added beat patterns to level");
 
   g->levelSegment = levelGetCurrentSegment(*g->level, g->tempo);
-  l->Info("got current level segment, level loading complete");
 
   pickupTime = secondsPerBeat(g->tempo);
 
@@ -111,7 +97,7 @@ int main() {
 
 void Update(float deltaTime) {
   CountQuarters();
-  
+
   if (g->spawnedThisBeat == false) {
     if (g->currentQuarter == 1) {
       GetSpriteEntity(points[0], DrawTex, AnimationState::PAUSED,
@@ -251,11 +237,50 @@ void DrawTex(Entity *e) {
   DrawTexturePro(e->texture, sr, dr, origin, GetTime() * e->rotSpeed, RAYWHITE);
 }
 
-
 void CountQuarters() {
   g->currentQuarter = getBeat(g->music, QUARTER, g->tempo).beatNumber;
   if (g->lastQuarter < g->currentQuarter) {
     g->spawnedThisBeat = false;
     g->lastQuarter = g->currentQuarter;
   }
+}
+
+void AllocatePatterns() {
+  g->fourQuarters = new Pattern({
+      Beat(),
+      Beat(),
+      Beat(),
+      Beat(),
+  });
+
+  g->twoHalves = new Pattern({
+      Beat(HALF),
+      Beat(HALF),
+  });
+
+  g->oneAndTwoThreeAndFour = new Pattern({
+      Beat(EIGHTH),
+      Beat(EIGHTH),
+      Beat(),
+      Beat(EIGHTH),
+      Beat(EIGHTH),
+      Beat(),
+  });
+
+  g->oneTwoAndThreeFour = new Pattern({
+      Beat(),
+      Beat(EIGHTH),
+      Beat(EIGHTH),
+      Beat(),
+      Beat(),
+  });
+
+  g->oneTwoAndThreeAndFour = new Pattern({
+      Beat(),
+      Beat(EIGHTH),
+      Beat(EIGHTH),
+      Beat(EIGHTH),
+      Beat(EIGHTH),
+      Beat(),
+  });
 }

@@ -3,11 +3,13 @@
 #include <raygui.h>
 #include "Entity.hpp"
 #include "Global.hpp"
-
+#include "TextureAtlas.hpp"
 
 void Update();
 void Draw();
 void DrawRect(Entity* e);
+
+static TextureAtlas ta;
 
 int main() {
 	SetTraceLogLevel(LOG_WARNING);
@@ -15,19 +17,9 @@ int main() {
 	
 	l->Info("Hello, Minijam!");
 
-	
-	Entity* e = new Entity {
-		{50, 50},
-		{20, 20},
-		{10, 10},
-		{50, 50},
-		5.0,
-		0.0,
-		AnimationState::PLAYING,
-		DrawRect,
-	};
+	ta.TALoadTexture("conveyorbelt");
 
-	g->entities.push_back(e);
+	GetRectangleEntity({20, 20}, {20, 20}, DrawRect);
 
 	while (!WindowShouldClose()) {
 		Update();
@@ -52,7 +44,8 @@ void Draw() {
 	BeginDrawing();
 
 	ClearBackground(BLACK);
-
+	
+	DrawTexture(ta.GetTexture("conveyorbelt"), 0, 0, WHITE);
 	for (Entity* e : g->entities) {
 		e->renderMethod(e);
 	}

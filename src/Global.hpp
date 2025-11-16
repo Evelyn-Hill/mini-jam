@@ -1,7 +1,8 @@
 #pragma once
 #include "Log.hpp"
 #include <vector>
-#include "Entity.hpp"
+
+struct Entity;
 
 struct Global {
 	std::vector<Entity*> entities;

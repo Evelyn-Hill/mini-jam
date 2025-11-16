@@ -5,11 +5,13 @@ project(mini-jam)
 
 add_subdirectory(vendor/raylib)
 
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SRC 
 	src/main.cpp
 	src/Global.cpp
+	src/TextureAtlas.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

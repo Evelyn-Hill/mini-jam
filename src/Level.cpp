@@ -1,42 +1,16 @@
 #include "Level.hpp"
 #include "Rhythm.hpp"
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
 
 void levelInit(Level *lv) {
-  lv->segments = NULL;
-  lv->current = NULL;
-  lv->len = 0;
-  lv->cap = 0;
-}
-
-void levelInit(Level *lv, int cap) {
-  lv->segments = (Pattern*)malloc(sizeof(Pattern) * cap);
-  lv->current = lv->segments;
-
-  lv->len = 0;
-  lv->cap = cap;
+  lv->current = &lv->current[0];
 }
 
 void levelAppend(Level *lv, Pattern pattern) {
-  if (lv->len + 1 > lv->cap) {
-    size_t newCap = lv->cap >= 8 ? 8 : lv->cap * 2;
-    Pattern *newSegments = (Pattern*)realloc(lv->segments, sizeof(Pattern) * newCap);
-    lv->cap = newCap;
-  }
-
-  Pattern p;
-  for (auto b : pattern.rhythm) {
-    p.rhythm.push_back(b);
-  }
-  p.time = 0;
-  lv->segments[lv->len] = p;
-  lv->len += 1;
+  lv->segments.push_back(pattern);
 }
 
 bool levelIsAtEnd(Level *lv) {
-  return lv->current >= lv->segments;
+  return lv->current >= &lv->segments[lv->segments.size() - 1];
 }
 
 Pattern *levelPeek(Level *lv) {

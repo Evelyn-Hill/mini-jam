@@ -2,13 +2,10 @@
 #define LEVEL_H
 
 #include "Rhythm.hpp"
-#include <cstddef>
 
 struct Level {
-  Pattern *segments;
+  std::vector<Pattern> segments;
   Pattern *current;
-  size_t len;
-  size_t cap;
 };
 
 void levelInit(Level *lv);

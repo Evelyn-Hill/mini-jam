@@ -12,6 +12,9 @@ struct Global {
   float tempo;
   Level level;
   LevelSegment levelSegment;
+  int currentQuarter;
+  int lastQuarter;
+  bool spawnedThisBeat;
 };
 
 extern Global *g;
